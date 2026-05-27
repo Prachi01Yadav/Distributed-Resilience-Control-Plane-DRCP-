@@ -1,17 +1,17 @@
-# 🛡️ Distributed Resilience Control Plane (DRCP)
+# Distributed Resilience Control Plane (DRCP)
 
 [![Go Version](https://img.shields.io/badge/Go-1.25-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat&logo=docker)](https://www.docker.com/)
 [![Render](https://img.shields.io/badge/Deployed_on-Render-000000?style=flat&logo=render)](https://render.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-**Live Demo:** 🚀 [https://drcp-dashboard.onrender.com](https://drcp-dashboard.onrender.com)
+**Live Demo:** [https://drcp-dashboard.onrender.com](https://drcp-dashboard.onrender.com)
 
 A production-grade, distributed control plane that enforces **Service Level Agreements (SLAs)** across microservice architectures through real-time telemetry ingestion, automated circuit breaking, and immutable blockchain audit trails.
 
 ---
 
-## 📖 Overview
+## Overview
 
 In modern, highly scaled microservice architectures, an outage in one downstream service can quickly cascade and take down the entire system. **DRCP** acts as the central brain to prevent this. 
 
@@ -19,7 +19,7 @@ It allows platform engineers to define strict SLA contracts (e.g., *Service A mu
 
 ---
 
-## ✨ Core Features
+## Core Features
 
 1. **Service Registry**: A centralized hub to register, discover, and monitor the health of all microservices within the mesh.
 2. **Dynamic SLA Contracts**: Define latency and error-rate thresholds dynamically using Open Policy Agent (OPA) Rego policies.
@@ -30,7 +30,7 @@ It allows platform engineers to define strict SLA contracts (e.g., *Service A mu
 
 ---
 
-## 🏗️ Architecture Breakdown
+## Architecture Breakdown
 
 The system is highly decoupled and composed of several specialized microservices communicating asynchronously:
 
@@ -69,7 +69,7 @@ Simultaneously, the incident is forwarded to the anchoring service. The service 
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technologies Used |
 |---|---|
@@ -86,7 +86,7 @@ Simultaneously, the incident is forwarded to the anchoring service. The service 
 
 ---
 
-## 🚀 Quick Start (Local Run)
+## Quick Start (Local Run)
 
 ### Prerequisites
 - Go 1.25+
@@ -110,7 +110,7 @@ Open your browser and navigate to:
 
 ---
 
-## 📚 API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -125,7 +125,7 @@ Open your browser and navigate to:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 sentinelmesh/
