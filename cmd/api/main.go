@@ -27,18 +27,29 @@ func main() {
 	}
 	defer logg.Sync()
 
-	// Initialize DB (PostgreSQL via Docker)
-	dbCfg := db.Config{
-		Host:     "localhost",
-		Port:     5432,
-		User:     "postgres",
-		Password: "password",
-		DBName:   "sentinelmesh",
-		SSLMode:  "disable",
-	}
-	database, err := db.NewPostgresDB(dbCfg)
-	if err != nil {
-		logg.Fatal("Failed to connect to database", zap.Error(err))
+	// Initialize DB
+	var database *gorm.DB
+	
+	if os.Getenv("DATABASE_TYPE") == "sqlite" {
+		logg.Info("Using SQLite database")
+		database, err = db.NewSqliteDB("sentinelmesh.db")
+		if err != nil {
+			logg.Fatal("Failed to connect to SQLite", zap.Error(err))
+		}
+	} else {
+		logg.Info("Using PostgreSQL database")
+		dbCfg := db.Config{
+			Host:     "localhost",
+			Port:     5432,
+			User:     "postgres",
+			Password: "password",
+			DBName:   "sentinelmesh",
+			SSLMode:  "disable",
+		}
+		database, err = db.NewPostgresDB(dbCfg)
+		if err != nil {
+			logg.Fatal("Failed to connect to database", zap.Error(err))
+		}
 	}
 
 	// Auto-Migrate schema

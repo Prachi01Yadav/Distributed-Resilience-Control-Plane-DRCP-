@@ -4,7 +4,7 @@ FROM golang:1.23-alpine AS builder
 WORKDIR /app
 
 # Install build dependencies
-RUN apk add --no-cache git
+RUN apk add --no-cache git build-base gcc musl-dev
 
 # Copy go module files first for caching
 COPY go.mod go.sum ./
@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the API binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o /drcp-api ./cmd/api
+RUN CGO_ENABLED=1 GOOS=linux go build -o /drcp-api ./cmd/api
 
 # Runtime stage
 FROM alpine:3.19
