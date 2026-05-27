@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelmesh-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sentinelmesh-api
+  template:
+    metadata:
+      labels:
+        app: sentinelmesh-api
+    spec:
+      containers:
+        - name: api
+          image: your-docker-repo/sentinelmesh-api:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: "postgres"
+            - name: KAFKA_BROKERS
+              value: "kafka:9092"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelmesh-worker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sentinelmesh-worker
+  template:
+    metadata:
+      labels:
+        app: sentinelmesh-worker
+    spec:
+      containers:
+        - name: worker
+          image: your-docker-repo/sentinelmesh-worker:latest
+          env:
+            - name: REDIS_URL
+              value: "redis-master:6379"
+            - name: KAFKA_BROKERS
+              value: "kafka:9092"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelmesh-xds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentinelmesh-xds
+  template:
+    metadata:
+      labels:
+        app: sentinelmesh-xds
+    spec:
+      containers:
+        - name: xds
+          image: your-docker-repo/sentinelmesh-xds:latest
+          ports:
+            - containerPort: 18000
+          env:
+            - name: REDIS_URL
+              value: "redis-master:6379"

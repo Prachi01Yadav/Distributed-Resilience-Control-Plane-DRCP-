@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRCP Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="shield-check" class="logo-icon"></i>
+                    <span title="Distributed Resilience Control Plane">DRCP</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i data-lucide="layout-dashboard"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-view="services">
+                    <i data-lucide="server"></i> Services
+                </a>
+                <a href="#" class="nav-item" data-view="contracts">
+                    <i data-lucide="file-text"></i> SLA Contracts
+                </a>
+                <a href="#" class="nav-item" data-view="incidents">
+                    <i data-lucide="alert-triangle"></i> Incidents
+                </a>
+                <a href="#" class="nav-item" data-view="settings">
+                    <i data-lucide="settings"></i> Settings
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <div class="pulse-dot"></div>
+                    <span>Mesh Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-search">
+                    <i data-lucide="search"></i>
+                    <input type="text" placeholder="Search resources..." id="global-search">
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="toggleNotifications()" id="bell-btn"><i data-lucide="bell"></i></button>
+                    <div class="avatar">A</div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+
+                <!-- ==================== DASHBOARD VIEW ==================== -->
+                <div id="view-dashboard" class="view-section active">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Overview</h1>
+                            <p class="page-subtitle">Real-time metrics and mesh health monitoring.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('service-modal')">
+                            <i data-lucide="plus"></i> New Service
+                        </button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card fade-in" style="animation-delay:0.1s">
+                            <div class="stat-header">
+                                <span class="stat-title">Total Services</span>
+                                <div class="stat-icon teal"><i data-lucide="server"></i></div>
+                            </div>
+                            <div class="stat-value" id="stat-total-services">0</div>
+                            <div class="stat-trend positive"><i data-lucide="trending-up"></i> <span>Updated just now</span></div>
+                        </div>
+                        <div class="stat-card fade-in" style="animation-delay:0.2s">
+                            <div class="stat-header">
+                                <span class="stat-title">Active SLAs</span>
+                                <div class="stat-icon cyan"><i data-lucide="file-check"></i></div>
+                            </div>
+                            <div class="stat-value" id="stat-active-slas">0</div>
+                            <div class="stat-trend positive"><i data-lucide="activity"></i> <span>100% compliance</span></div>
+                        </div>
+                        <div class="stat-card fade-in" style="animation-delay:0.3s">
+                            <div class="stat-header">
+                                <span class="stat-title">Open Incidents</span>
+                                <div class="stat-icon amber"><i data-lucide="alert-triangle"></i></div>
+                            </div>
+                            <div class="stat-value" id="stat-open-incidents">0</div>
+                            <div class="stat-trend"><span style="color:var(--text-muted);">No active breaches</span></div>
+                        </div>
+                    </div>
+                    <div class="table-card fade-in" style="animation-delay:0.4s">
+                        <div class="table-header"><h2>Recent Services</h2></div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>Service</th><th>Owner</th><th>Status</th><th>Health</th><th>Date Added</th><th>Action</th></tr></thead>
+                                <tbody id="dashboard-services-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== SERVICES VIEW ==================== -->
+                <div id="view-services" class="view-section">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Service Registry</h1>
+                            <p class="page-subtitle">Manage all microservices under DRCP protection.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('service-modal')">
+                            <i data-lucide="plus"></i> Register Service
+                        </button>
+                    </div>
+                    <div class="table-card fade-in">
+                        <div class="table-header">
+                            <h2>All Services</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>Service</th><th>Owner</th><th>Description</th><th>Status</th><th>Health</th><th>Created</th><th>Actions</th></tr></thead>
+                                <tbody id="services-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== SLA CONTRACTS VIEW ==================== -->
+                <div id="view-contracts" class="view-section">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">SLA Contracts</h1>
+                            <p class="page-subtitle">View and manage all service-level agreements.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('contract-modal')">
+                            <i data-lucide="plus"></i> New Contract
+                        </button>
+                    </div>
+                    <div class="table-card fade-in">
+                        <div class="table-header"><h2>All Contracts</h2></div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>Contract ID</th><th>Service ID</th><th>Policy</th><th>Status</th><th>Created</th></tr></thead>
+                                <tbody id="contracts-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== INCIDENTS VIEW ==================== -->
+                <div id="view-incidents" class="view-section">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Incident Log</h1>
+                            <p class="page-subtitle">SLA breach events and blockchain audit trail.</p>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card fade-in" style="animation-delay:0.1s">
+                            <div class="stat-header">
+                                <span class="stat-title">Total Incidents</span>
+                                <div class="stat-icon amber"><i data-lucide="zap"></i></div>
+                            </div>
+                            <div class="stat-value" id="incidents-total">0</div>
+                        </div>
+                        <div class="stat-card fade-in" style="animation-delay:0.2s">
+                            <div class="stat-header">
+                                <span class="stat-title">Open</span>
+                                <div class="stat-icon red"><i data-lucide="alert-circle"></i></div>
+                            </div>
+                            <div class="stat-value" id="incidents-open">0</div>
+                        </div>
+                        <div class="stat-card fade-in" style="animation-delay:0.3s">
+                            <div class="stat-header">
+                                <span class="stat-title">Anchored On-Chain</span>
+                                <div class="stat-icon teal"><i data-lucide="link"></i></div>
+                            </div>
+                            <div class="stat-value" id="incidents-anchored">0</div>
+                        </div>
+                    </div>
+                    <div class="table-card fade-in" style="animation-delay:0.4s">
+                        <div class="table-header"><h2>All Incidents</h2></div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>Incident ID</th><th>Service ID</th><th>Error Rate</th><th>P99 Latency</th><th>Status</th><th>Blockchain TX</th><th>Occurred</th></tr></thead>
+                                <tbody id="incidents-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== SETTINGS VIEW ==================== -->
+                <div id="view-settings" class="view-section">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Settings</h1>
+                            <p class="page-subtitle">Configure your DRCP control plane.</p>
+                        </div>
+                    </div>
+                    <div class="settings-grid fade-in">
+                        <div class="settings-card">
+                            <h3>General</h3>
+                            <div class="setting-row">
+                                <div>
+                                    <label class="form-label">Control Plane Name</label>
+                                    <p class="setting-desc">The display name for this DRCP instance.</p>
+                                </div>
+                                <input type="text" class="form-input" value="DRCP Production" style="max-width: 280px;">
+                            </div>
+                            <div class="setting-row">
+                                <div>
+                                    <label class="form-label">API Endpoint</label>
+                                    <p class="setting-desc">Base URL for the REST API.</p>
+                                </div>
+                                <input type="text" class="form-input" value="http://localhost:8080/api/v1" style="max-width: 280px;" readonly>
+                            </div>
+                        </div>
+                        <div class="settings-card">
+                            <h3>Infrastructure</h3>
+                            <div class="setting-row">
+                                <div>
+                                    <label class="form-label">PostgreSQL</label>
+                                    <p class="setting-desc">Primary data store connection.</p>
+                                </div>
+                                <span class="badge badge-success">Connected</span>
+                            </div>
+                            <div class="setting-row">
+                                <div>
+                                    <label class="form-label">Redis</label>
+                                    <p class="setting-desc">In-memory cache and sliding window store.</p>
+                                </div>
+                                <span class="badge badge-warning" id="redis-status">Disconnected</span>
+                            </div>
+                            <div class="setting-row">
+                                <div>
+                                    <label class="form-label">Apache Kafka</label>
+                                    <p class="setting-desc">Event streaming backbone.</p>
+                                </div>
+                                <span class="badge badge-warning" id="kafka-status">Disconnected</span>
+                            </div>
+                        </div>
+                        <div class="settings-card">
+                            <h3>Security</h3>
+                            <div class="setting-row">
+                                <div>
+                                    <label class="form-label">Blockchain Anchoring</label>
+                                    <p class="setting-desc">Ethereum network for immutable audit trail.</p>
+                                </div>
+                                <span class="badge badge-muted">Not Configured</span>
+                            </div>
+                            <div class="setting-row">
+                                <div>
+                                    <label class="form-label">Envoy xDS Server</label>
+                                    <p class="setting-desc">gRPC control plane for proxy configuration.</p>
+                                </div>
+                                <input type="text" class="form-input" value="localhost:18000" style="max-width: 280px;" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Register Service Modal -->
+    <div class="modal-overlay" id="service-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Register Service</h3>
+                <button class="icon-btn" onclick="closeModal('service-modal')" type="button"><i data-lucide="x"></i></button>
+            </div>
+            <form id="register-form" onsubmit="submitService(event)">
+                <div class="form-group">
+                    <label class="form-label">Service Name</label>
+                    <input type="text" class="form-input" id="svc-name" placeholder="e.g., auth-service" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Owner Team</label>
+                    <input type="text" class="form-input" id="svc-owner" placeholder="e.g., Platform Team" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="svc-desc" rows="3" placeholder="What does this service do?"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('service-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Contract Modal -->
+    <div class="modal-overlay" id="contract-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Create SLA Contract</h3>
+                <button class="icon-btn" onclick="closeModal('contract-modal')" type="button"><i data-lucide="x"></i></button>
+            </div>
+            <form id="contract-form" onsubmit="submitContract(event)">
+                <div class="form-group">
+                    <label class="form-label">Service</label>
+                    <select class="form-input" id="contract-service-id" required>
+                        <option value="">Select a service...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Policy (JSON)</label>
+                    <textarea class="form-textarea" id="contract-policy" rows="5" placeholder='{"max_error_rate": 0.01, "max_p99_latency_ms": 500}' required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('contract-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Contract</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
