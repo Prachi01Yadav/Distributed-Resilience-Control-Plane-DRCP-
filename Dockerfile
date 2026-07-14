@@ -13,8 +13,11 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the API binary
+# Build all binaries
 RUN CGO_ENABLED=1 GOOS=linux go build -o /drcp-api ./cmd/api
+RUN CGO_ENABLED=1 GOOS=linux go build -o /drcp-worker ./cmd/worker
+RUN CGO_ENABLED=1 GOOS=linux go build -o /drcp-xds ./cmd/xds
+RUN CGO_ENABLED=1 GOOS=linux go build -o /drcp-anchor ./cmd/anchor
 
 # Runtime stage
 FROM alpine:3.19
@@ -24,8 +27,11 @@ WORKDIR /app
 # Install runtime dependencies
 RUN apk add --no-cache ca-certificates tzdata
 
-# Copy binary from builder
+# Copy binaries from builder
 COPY --from=builder /drcp-api /app/drcp-api
+COPY --from=builder /drcp-worker /app/drcp-worker
+COPY --from=builder /drcp-xds /app/drcp-xds
+COPY --from=builder /drcp-anchor /app/drcp-anchor
 
 # Copy web frontend assets
 COPY --from=builder /app/web /app/web
